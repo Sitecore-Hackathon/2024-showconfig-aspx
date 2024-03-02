@@ -21,119 +21,67 @@ SharedFields:
 - ID: "b1a94ff0-6897-47c0-9c51-aa6acb80b1f0"
   Hint: Script
   Value: |
-    #Add this script in left click menu and read current item id
-    #$rendering = Get-Item -Path "master:" -Id "{AB2EDBA0-3960-4F12-B765-579DC231894A}"
     $rendering = Get-Item .
     $parameterTemplateField = 'Parameters Template'
     $datasourceTemplateField = 'Datasource Template'
     
-    function GetItemByPath {
-        param(
-            [string]$ItemPath,
-            [string]$Database = 'master'
-        )
+    function GetCommaSeparatedFields {
+    	param(
+    		[object]$Fields
+    	)
+    	$fieldsDataArray = New-Object collections.generic.list[object]
+    	foreach ($field in $Fields) {
+    		$fieldsDataArray.Add("$($field.Name) as $($field.Type)")
+    	}
     
-        return Get-Item -Path "$($database):\$($itemPath.ToLower().replace("/","\").Trim())"
+    	return $fieldsDataArray -join ","
     }
     
-    function ShowWarning {
-        param(
-            [string]$WarningMessage
-        )
+    function DisplayDialog {
+    	param(
+    		[string]$Message
+    	)
     
-        # TODO : Be sure to add an Enabled Rule on this script to ensure the warning only appears for the proper items.
-        $icon = "Office/16x16/robot.png"
-        $iconUrl = [Sitecore.Resources.Images]::GetThemedImageSource($icon)
-        $title = "Sample Warning"
-        #$text = "<img src='$($iconUrl)' />Something important requires your immediate attention!"
-        $text = $WarningMessage
+    	Read-Variable -Parameters `
+     		@{ Name = "TSX Code"; value = $Message; lines = 37; Tab = "$($rendering.Name).tsx"; } `
+     		-Description "Below is the code snippet you can use to incorporate the $($rendering.Name) component into your Next.js JSS project." `
+     		-Title "Sitecore JSON Rendering TypeScript Generator" -Width 750 -Height 750 -OkButtonName "Exit"
+    }
     
-        $warning = $pipelineArgs.Add()
-        $warning.Title = $title
-        $warning.Text = $text
-    
-        # Be sure to update this ID to whichever script you want to execute when the link is clicked.
-        $scriptId = "{6EAF681D-5D87-4C43-B279-356A8B9A15CF}"
-        $item = Get-Item -Path "."
-        $script = Get-Item -Path "master:" -Id $scriptId
-        $command = "item:executescript(id=$($item.ID),db=$($item.Database.Name),script=$($script.ID),scriptDb=$($script.Database.Name))"
-        $warning.AddOption("Click Me", $command)
-        $warning.HideFields = $false
+    function GetItemByPath {
+    	param(
+    		[string]$ItemPath,
+    		[string]$Database = 'master'
+    	)
+    	return Get-Item -Path "$($database):\$($itemPath.ToLower().replace("/","\").Trim())"
     }
     
     # Function to get the template from which a field is inherited
-    function GetInheritedTemplate ($fieldName, $template) {
-        $fieldItem = Get-Item -Path "master:" -Query "/sitecore/templates//*[@@templateid='$($template.ID)']/*[@@fieldname='$fieldName']"
-        if ($fieldItem -ne $null) {
-            $inheritedTemplate = $fieldItem."__Source".Split('|')[-1]
-            $inheritedTemplateItem = Get-Item -Path "master:" -Id $inheritedTemplate
-            if ($inheritedTemplateItem -ne $null) {
-                return $inheritedTemplateItem.Name
-            }
-        }
-        return ""
-    }
-    
-    function Get-SourceDataFromUrl {
-        param(
-            [string]$uri
-        )
-    
-        #TODO: Include authorization
-    
-        Invoke-WebRequest -Uri $uri -UseBasicParsing
-    }
-    
-    function Get-SitecoreItemByPath {
-        #Returned Item uses item.ID
-        #https://doc.sitecorepowershell.com/working-with-items#get-item-by-path
-        param(
-            [string]$path
-        )
-    
-        return Get-Item -Path "${database}:${path}" -ErrorAction SilentlyContinue
-    }
-    
-    function ReadSourceData {
-        #$data = Get-SourceDataFromFile "c:\inetpub\wwwroot\jobs_excerpt.json"
-        $data = Get-SourceDataFromUrl "https://api.jobvite.com/api/v2/job?api=panasonic_jobfeedapi_key&sc=f113f44378d4ffaf96d543e4e90546b9&availableTo=External&availableTo=Limited%2520Access&&subsidiaryName=Hussmann%20Corporation&start=1"
-        #$data = Get-SourceDataFromUrl "https://api.jobvite.com/api/v2/job?api=panasonic_jobfeedapi_key&sc=f113f44378d4ffaf96d543e4e90546b9&availableTo=External&availableTo=Limited%2520Access&&subsidiaryName=Hussmann%20Corporation&start=100&count=10"
-        $data = Clean-UnicodeEncodingErrors $data
-    
-        return Convert-DataToJson $data
-    }
-    
-    function Clean-UnicodeEncodingErrors {
-        param(
-            [string]$text
-        )
-    
-        $text = $text -replace "\?\?\?\?", "&bull;"
-        $text = $text -replace "\?\?\?", "'"
-        $text = $text -replace "\?\?", " "
-    
-        return $text
+    function GetInheritedTemplate ($fieldName,$template) {
+    	$fieldItem = Get-Item -Path "master:" -Query "/sitecore/templates//*[@@templateid='$($template.ID)']/*[@@fieldname='$fieldName']"
+    	if ($fieldItem -ne $null) {
+    		$inheritedTemplate = $fieldItem."__Source".Split('|')[-1]
+    		$inheritedTemplateItem = Get-Item -Path "master:" -Id $inheritedTemplate
+    		if ($inheritedTemplateItem -ne $null) {
+    			return $inheritedTemplateItem.Name
+    		}
+    	}
+    	return ""
     }
     
     function GetAIRepsonse {
-        param(
-            [string]$FieldsPrompt
-        )
+    	param(
+    		[string]$FieldsPrompt
+    	)
     
-        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=<Google-API-Key>"
+    	$apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCd26qvLH9rqDEFfIg63SGr5COmOzjXZU4"
     
-        $prompt1 = "create a typescript react sitecore nextjs component named 'Sample' based on a sitecore rendering which has fields:- $($FieldsPrompt)"
-        #Write-Host $prompt1
-        #$prompt2 = @". Keep casing for 'field names' variables as provied in the prompt. Use the below code as sample, remove the unwanted comments while generating new file. \\n`\\n//this line is mandatory\\nimport {\\n  Image as JssImage,\\n  Link as JssLink,\\n  RichText as JssRichText,\\n  Field,\\n  ImageField,\\n  LinkField,\\n} from '@sitecore-jss/sitecore-jss-nextjs';\\nimport React from 'react';\\n//alias Image as JssImage, Link as JssLink, RichText as JssRichText\\n//above components are imported from '@sitecore-jss/sitecore-jss-nextjs'\\n\\n//define an interface for the Fields in the rendering\\n/* \\n    for Image use ImageField,\\n    for Link use LinkField,\\n    for boolean values use Field<string>,\\n    for all others se Field<string>,\\n*/\\n//example\\ninterface Fields {\\n  Image: ImageField;\\n  Body: Field<string>;\\n  CTALink: LinkField;\\n  CheckBox: Field<string>;\\n}\\n\\n//define a type for the RenderingProps\\ntype RenderingProps = {\\n  params: { [key: string]: string };\\n  fields: Fields;\\n};\\n\\n//define a fallback component which will be return when do fields are found\\nconst RenderingDefaultComponent = (props: RenderingProps): JSX.Element => (\\n  <div className={component ${props.params.styles}}>\\n    <div className=\component-content\>\\n      <span className=\is-empty-hint\>No data found!</span>\\n    </div>\\n  </div>\\n);\\n\\n//define components based on the name of Headless Rendering Variant. The default variant name is \Default\\\nexport const Default = (props: RenderingProps): JSX.Element => {\\n  const id = props.params.RenderingIdentifier;\\n  if (props.fields) {\\n    return (\\n      <div className={component ${props.params.styles}} id={id ? id : undefined}>\\n        <div className=\component-content row\" > \\n < div className=\col\>\\n < JssImage field= { props.fields.Image } />\\n < /div>\\n < div className=\col\>\\n < JssRichText field= { props.fields.Body } />\\n < JssLink field= { props.fields.CTALink } />\\n < /div>\\n < /div>\\n < /div>\\n); \\n } \\n\\n return < RenderingDefaultComponent { ...props } />; \\n }; \\n\\n//any other variants will be added below\\n"
-        $prompt2 = @"
-    . Keep casing for 'field names' variables as provided in the prompt. Use the below code as a sample, remove the unwanted comments while generating a new file. \\n`\\n//this line is mandatory\\nimport {\\n  Image as JssImage,\\n  Link as JssLink,\\n  RichText as JssRichText,\\n  Field,\\n  ImageField,\\n  LinkField,\\n} from '@sitecore-jss/sitecore-jss-nextjs';\\nimport React from 'react';\\n//alias Image as JssImage, Link as JssLink, RichText as JssRichText\\n//above components are imported from '@sitecore-jss/sitecore-jss-nextjs'\\n\\n//define an interface for the Fields in the rendering\\n/* \\n    for Image use ImageField,\\n    for Link use LinkField,\\n    for boolean values use Field<string>,\\n    for all others se Field<string>,\\n*/\\n//example\\ninterface Fields {\\n  Image: ImageField;\\n  Body: Field<string>;\\n  CTALink: LinkField;\\n  CheckBox: Field<string>;\\n}\\n\\n//define a type for the RenderingProps\\ntype RenderingProps = {\\n  params: { [key: string]: string };\\n  fields: Fields;\\n};\\n\\n//define a fallback component which will be return when do fields are found\\nconst RenderingDefaultComponent = (props: RenderingProps): JSX.Element => (\\n  <div className={component ${props.params.styles}}>\\n    <div className=\component-content\>\\n      <span className=\is-empty-hint\>No data found!</span>\\n    </div>\\n  </div>\\n);\\n\\n//define components based on the name of Headless Rendering Variant. The default variant name is \Default\\\nexport const Default = (props: RenderingProps): JSX.Element => {\\n  const id = props.params.RenderingIdentifier;\\n  if (props.fields) {\\n    return (\\n      <div className={component ${props.params.styles}} id={id ? id : undefined}>\\n        <div className=\component-content row\" > \\n < div className=\col\>\\n < JssImage field= { props.fields.Image } />\\n < /div>\\n < div className=\col\>\\n < JssRichText field= { props.fields.Body } />\\n < JssLink field= { props.fields.CTALink } />\\n < /div>\\n < /div>\\n < /div>\\n); \\n } \\n\\n return < RenderingDefaultComponent { ...props } />; \\n }; \\n\\n//any other variants will be added below\\n
+    	$prompt = @" 
+    create a typescript react sitecore nextjs component named '$($rendering.Name)' based on a sitecore rendering which has fields:- $($FieldsPrompt). Keep casing for 'field names' variables as provided in the prompt. Use the below code as a sample, remove the unwanted comments while generating a new file. Ignore wrapping the react component in backticks \\n`\\nimport {\\n  Image as JssImage,\\n  Link as JssLink,\\n  RichText as JssRichText,\\n  Field,\\n  ImageField,\\n  LinkField,\\n} from '@sitecore-jss/sitecore-jss-nextjs';\\nimport React from 'react';\\n//alias Image as JssImage, Link as JssLink, RichText as JssRichText\\n//above components are imported from '@sitecore-jss/sitecore-jss-nextjs'\\n\\n//define an interface for the Fields in the rendering\\n/* \\n    for Image use ImageField,\\n    for Link use LinkField,\\n    for boolean values use Field<string>,\\n    for all others se Field<string>,\\n*/\\n//example\\ninterface Fields {\\n  Image: ImageField;\\n  Body: Field<string>;\\n  CTALink: LinkField;\\n  CheckBox: Field<string>;\\n}\\n\\n//define a type for the RenderingProps\\ntype RenderingProps = {\\n  params: { [key: string]: string };\\n  fields: Fields;\\n};\\n\\n//define a fallback component which will be return when do fields are found\\nconst RenderingDefaultComponent = (props: RenderingProps): JSX.Element => (\\n  <div className={component ${props.params.styles}}>\\n    <div className=\component-content\>\\n      <span className=\is-empty-hint\>No data found!</span>\\n    </div>\\n  </div>\\n);\\n\\n//define components based on the name of Headless Rendering Variant. The default variant name is \Default\\\nexport const Default = (props: RenderingProps): JSX.Element => {\\n  const id = props.params.RenderingIdentifier;\\n  if (props.fields) {\\n    return (\\n      <div className={component ${props.params.styles}} id={id ? id : undefined}>\\n        <div className=\component-content row\" > \\n < div className=\col\>\\n < JssImage field= { props.fields.Image } />\\n < /div>\\n < div className=\col\>\\n < JssRichText field= { props.fields.Body } />\\n < JssLink field= { props.fields.CTALink } />\\n < /div>\\n < /div>\\n < /div>\\n); \\n } \\n\\n return < RenderingDefaultComponent { ...props } />; \\n }; \\n\\n//any other variants will be added below\\n
     "@
     
-        $prompt = $prompt1 + $prompt2
-        #Write-Host $prompt
-        
-        # Define the JSON payload
-    $jsonPayload = @"
+    	# Define the JSON payload
+    	$jsonPayload = @"
         {
           "contents": [
             {
@@ -143,56 +91,46 @@ SharedFields:
                 }
               ]
             }
-          ]
+          ],
+          "generationConfig": {
+        "temperature": 0.2,
+        "topK": 1,
+        "topP": 0.2,
+        "stopSequences": []
+      }
         }
-    "@ 
+    "@
     
-    #$jsonPayload =
     
-    # Define headers
-    $headers = @{
-    	"Content-Type" = "application/json"
-    }
+    	# Define headers
+    	$headers = @{
+    		"Content-Type" = "application/json"
+    	}
     
-    # Output the response
-    $response = Invoke-RestMethod -Uri $apiUrl -Method Post -Headers $headers -Body $jsonPayload #-UseBasicParsing #-ErrorAction Stop 
+    	# Output the response
+    	$response = Invoke-RestMethod -Uri $apiUrl -Method Post -Headers $headers -Body $jsonPayload
     
-    #write-host  $response.Candidates[0].content.parts[0].text
-    
-        return $response.Candidates[0].content.parts[0].text
+    	return $response.Candidates[0].content.parts[0].text
     
     }
-    
-    #function CreateCustomObject
-    
-    # Use splatting to map the properties
     
     $datasourceTemplate = GetItemByPath ($rendering[$datasourceTemplateField])
     
     if ($datasourceTemplate) {
-        # Do something in Powerful Ways
-        Write-Host $datasourceTemplate.FullPath
-        # Get all fields of the template
-        $fields = ([Sitecore.Data.Items.TemplateItem]$datasourceTemplate).OwnFields #| Where-Object { $Key -notcontains $_ } 
-        # $fields | Show-ListView -Property Name, Type, Key, Source, Title, DisplayName, Id
+    	# Get all fields of the template
+    	$fields = ([Sitecore.Data.Items.TemplateItem]$datasourceTemplate).OwnFields
     
-        $fieldsDataArray = New-Object collections.generic.list[object]
-        foreach ($field in $fields) {
-            <# $field is the current item #>
-            $fieldsDataArray.Add("$($field.Name) as $($field.Type) ")
-        }
     
-        $promptFields = $fieldsDataArray -join ","
+    	$promptFields = GetCommaSeparatedFields ($fields)
     
-        $response = GetAIRepsonse($promptFields)
-        
-        Write-Host $response
+    	$response = GetAIRepsonse ($promptFields)
+    
+    	DisplayDialog ($response)
     
     }
     else {
-    
-        ShowWarning (" Datasource Template is not selected.")
-    }
+    	Show-Alert -Title "Datasource Template is not selected!"
+    } 
 Languages:
 - Language: en
   Versions:
@@ -211,11 +149,11 @@ Languages:
         sitecore\Admin
     - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
       Hint: __Revision
-      Value: "afc8766b-c3a1-418d-a475-4a3a6cc982a8"
+      Value: "2f183498-fe55-4b9d-b2a7-a559cff87692"
     - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
       Hint: __Updated by
       Value: |
         sitecore\Admin
     - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
       Hint: __Updated
-      Value: 20240302T172326Z
+      Value: 20240302T185051Z
