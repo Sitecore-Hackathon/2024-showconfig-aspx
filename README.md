@@ -2,8 +2,6 @@
 
 # Sitecore Hackathon 2024
 
-- MUST READ: **[Submission requirements](SUBMISSION_REQUIREMENTS.md)**
-- [Entry form template](ENTRYFORM.md)
 
 ## Team name
 
@@ -25,13 +23,8 @@
 
 ## Pre-requisites and Dependencies
 
-⟹ Does your module rely on other Sitecore modules or frameworks?
+- Sitecore 10.3.1 with SXA and Headless Services 21.0.587
 
-- List any dependencies
-- Or other modules that must be installed
-- Or services that must be enabled/configured
-
-_Remove this subsection if your entry does not have any prerequisites other than Sitecore_
 
 ## Installation instructions
 
@@ -84,26 +77,17 @@ Step 06: To push your serialization changes to your Sitecore instance, run the f
 
 ### Configuration
 
-⟹ If there are any custom configuration that has to be set manually then remember to add all details here.
-
-_Remove this subsection if your entry does not require any configuration that is not fully covered in the installation instructions already_
+⟹ Make sure to update **googleApiKey** in script at path - */sitecore/system/Modules/PowerShell/Script Library/SPE/SitecoreAI/CodeGen Assistant/Content Editor/Context Menu/Generate Typescript Code*
 
 ## Usage instructions
 
-⟹ Provide documentation about your module, how do the users use your module, where are things located, what do the icons mean, are there any secret shortcuts etc.
+⟹ Alternatively, you can install [this](/packages/JsonRenderingTSGenerator-v1.0.0.zip) Sitecore package directly to your Sitecore instance. And the module is ready for use.
 
-Include screenshots where necessary. You can add images to the `./images` folder and then link to them from your documentation:
+![Working Module](/docs/video/Showconfig.aspx-Demo.gif?raw=true)
+
 
 ![Hackathon Logo](docs/images/hackathon.png?raw=true "Hackathon Logo")
 
-You can embed images of different formats too:
-
-![Deal With It](docs/images/deal-with-it.gif?raw=true "Deal With It")
-
-And you can embed external images too:
-
-![Random](https://thiscatdoesnotexist.com/)
-
 ## Comments
 
-If you'd like to make additional comments that is important for your module entry.
+Our module automates TypeScript file creation for Sitecore JSON renderings, saving developers time and effort. No more manual interface building – just seamless integration of JSON data into TypeScript projects for enhanced efficiency and accuracy in Sitecore development.
