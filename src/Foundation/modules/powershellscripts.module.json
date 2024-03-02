@@ -1,0 +1,9 @@
+{ 
+	"namespace": "SitecoreAI",
+	"items": {
+		"includes": [{
+			"name": "Powershell.Scripts.SitecoreAI",
+			"path": "/sitecore/system/Modules/PowerShell/Script Library/SPE/SitecoreAI"
+		}]
+	}	
+}
