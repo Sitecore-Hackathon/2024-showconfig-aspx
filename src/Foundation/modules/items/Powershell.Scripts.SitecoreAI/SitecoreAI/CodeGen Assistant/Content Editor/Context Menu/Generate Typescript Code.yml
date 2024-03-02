@@ -24,6 +24,7 @@ SharedFields:
     $rendering = Get-Item .
     $parameterTemplateField = 'Parameters Template'
     $datasourceTemplateField = 'Datasource Template'
+    $googleApiKey = '<Google_API_Key>'
     
     function GetAllCustomFields {
     	param(
@@ -86,7 +87,7 @@ SharedFields:
     		[string]$FieldsPrompt
     	)
     
-    	$apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=<Google_API_Key>"
+    	$apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$($googleApiKey)"
     
     	$prompt = @" 
     create a typescript react sitecore nextjs component named '$($rendering.Name)' based on a sitecore rendering which has fields:- $($FieldsPrompt). Keep casing for 'field names' variables as provided in the prompt. Use the below code as a sample, remove the unwanted comments while generating a new file. Ignore wrapping the react component in backticks \\n`\\nimport {\\n  Image as JssImage,\\n  Link as JssLink,\\n  RichText as JssRichText,\\n  Field,\\n  ImageField,\\n  LinkField,\\n} from '@sitecore-jss/sitecore-jss-nextjs';\\nimport React from 'react';\\n//alias Image as JssImage, Link as JssLink, RichText as JssRichText\\n//above components are imported from '@sitecore-jss/sitecore-jss-nextjs'\\n\\n//define an interface for the Fields in the rendering\\n/* \\n    for Image use ImageField,\\n    for Link use LinkField,\\n    for boolean values use Field<string>,\\n    for all others se Field<string>,\\n*/\\n//example\\ninterface Fields {\\n  Image: ImageField;\\n  Body: Field<string>;\\n  CTALink: LinkField;\\n  CheckBox: Field<string>;\\n}\\n\\n//define a type for the RenderingProps\\ntype RenderingProps = {\\n  params: { [key: string]: string };\\n  fields: Fields;\\n};\\n\\n//define a fallback component which will be return when do fields are found\\nconst RenderingDefaultComponent = (props: RenderingProps): JSX.Element => (\\n  <div className={component ${props.params.styles}}>\\n    <div className=\component-content\>\\n      <span className=\is-empty-hint\>No data found!</span>\\n    </div>\\n  </div>\\n);\\n\\n//define components based on the name of Headless Rendering Variant. The default variant name is \Default\\\nexport const Default = (props: RenderingProps): JSX.Element => {\\n  const id = props.params.RenderingIdentifier;\\n  if (props.fields) {\\n    return (\\n      <div className={component ${props.params.styles}} id={id ? id : undefined}>\\n        <div className=\component-content row\" > \\n < div className=\col\>\\n < JssImage field= { props.fields.Image } />\\n < /div>\\n < div className=\col\>\\n < JssRichText field= { props.fields.Body } />\\n < JssLink field= { props.fields.CTALink } />\\n < /div>\\n < /div>\\n < /div>\\n); \\n } \\n\\n return < RenderingDefaultComponent { ...props } />; \\n }; \\n\\n//any other variants will be added below\\n
@@ -161,11 +162,11 @@ Languages:
         sitecore\Admin
     - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
       Hint: __Revision
-      Value: "439435df-09ac-4f0c-9531-5cd1e9e1abe1"
+      Value: "38320bc6-0b8e-4c32-afa4-aeb7b7331aba"
     - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
       Hint: __Updated by
       Value: |
         sitecore\Admin
     - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
       Hint: __Updated
-      Value: 20240302T194647Z
+      Value: 20240302T205237Z
