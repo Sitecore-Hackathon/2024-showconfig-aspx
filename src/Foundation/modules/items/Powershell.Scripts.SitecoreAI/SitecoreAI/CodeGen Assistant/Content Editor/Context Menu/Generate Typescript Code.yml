@@ -25,6 +25,18 @@ SharedFields:
     $parameterTemplateField = 'Parameters Template'
     $datasourceTemplateField = 'Datasource Template'
     
+    function GetAllCustomFields {
+    	param(
+    		[object]$Item
+    	)
+    
+    	$allfields = ([Sitecore.Data.Items.TemplateItem]$Item).Fields
+    	# filter out standard fields
+    	$customFields = $allfields | Where-Object { $_.Key -notlike '__**' }
+    
+    	return $customFields
+    }
+    
     function GetCommaSeparatedFields {
     	param(
     		[object]$Fields
@@ -118,10 +130,10 @@ SharedFields:
     
     if ($datasourceTemplate) {
     	# Get all fields of the template
-    	$fields = ([Sitecore.Data.Items.TemplateItem]$datasourceTemplate).OwnFields
+    	##$fields = ([Sitecore.Data.Items.TemplateItem]$datasourceTemplate).OwnFields
+    	$allFields = GetAllCustomFields ($datasourceTemplate)
     
-    
-    	$promptFields = GetCommaSeparatedFields ($fields)
+    	$promptFields = GetCommaSeparatedFields ($allFields)
     
     	$response = GetAIRepsonse ($promptFields)
     
@@ -149,11 +161,11 @@ Languages:
         sitecore\Admin
     - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
       Hint: __Revision
-      Value: "2f183498-fe55-4b9d-b2a7-a559cff87692"
+      Value: "439435df-09ac-4f0c-9531-5cd1e9e1abe1"
     - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
       Hint: __Updated by
       Value: |
         sitecore\Admin
     - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
       Hint: __Updated
-      Value: 20240302T185051Z
+      Value: 20240302T194647Z
