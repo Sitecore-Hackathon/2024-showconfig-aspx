@@ -120,7 +120,7 @@ SharedFields:
             [string]$FieldsPrompt
         )
     
-        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCd26qvLH9rqDEFfIg63SGr5COmOzjXZU4"
+        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=<Google-API-Key>"
     
         $prompt1 = "create a typescript react sitecore nextjs component named 'Sample' based on a sitecore rendering which has fields:- $($FieldsPrompt)"
         #Write-Host $prompt1
@@ -211,11 +211,11 @@ Languages:
         sitecore\Admin
     - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
       Hint: __Revision
-      Value: "27de8e7f-72e7-4aba-8934-e3de58e092f7"
+      Value: "afc8766b-c3a1-418d-a475-4a3a6cc982a8"
     - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
       Hint: __Updated by
       Value: |
         sitecore\Admin
     - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
       Hint: __Updated
-      Value: 20240302T152422Z
+      Value: 20240302T172326Z
